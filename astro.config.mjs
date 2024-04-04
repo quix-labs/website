@@ -1,17 +1,18 @@
-import { defineConfig } from 'astro/config';
-// Use Vercel Edge Functions (Recommended)
-import vercel from '@astrojs/vercel/edge';
-// Can also use Serverless Functions
-// import vercel from '@astrojs/vercel/serverless';
-// Or a completely static build
-// import vercel from '@astrojs/vercel/static';
+import {defineConfig} from 'astro/config';
+import mdx from '@astrojs/mdx';
+import sitemap from '@astrojs/sitemap';
 
+import vercel from "@astrojs/vercel/serverless";
+
+// https://astro.build/config
 export default defineConfig({
-  output: 'server',
-  experimental: {
-    assets: true
-   },
-  adapter: vercel({
-    imageService: true,
-  }),
+    site: 'https://example.com',
+    integrations: [mdx(), sitemap()],
+    output: "server",
+    adapter: vercel({
+        imageService: true,
+        webAnalytics: {
+            enabled: true,
+        }
+    })
 });
