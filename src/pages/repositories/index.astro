@@ -1,0 +1,154 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import {
+    SITE_TITLE,
+    SITE_DESCRIPTION,
+    GITHUB_ORGANIZATION_NAME,
+    GITHUB_EXCLUDED_REPOS,
+    GITHUB_API_TOKEN
+} from '../../consts';
+import FormattedDate from '../../components/FormattedDate.astro';
+
+
+const githubRepositories = await fetch(
+    `https://api.github.com/orgs/${GITHUB_ORGANIZATION_NAME}/repos?type=public&sort=created&direction=desc`,
+    {headers: {Authorization: `Bearer ${GITHUB_API_TOKEN}`}}
+)
+    .then(r => r.json())
+    .then((repositories: Array<any>) => repositories.filter(repo => !GITHUB_EXCLUDED_REPOS.includes(repo.name)))
+
+// Try to load screenshot.png for each repository
+const repositoriesImages = Object.fromEntries((await Promise.all(githubRepositories.map(repo => fetch(
+    repo.contents_url.replace('{+path}', 'screenshot.png'),
+    {headers: {Authorization: `Bearer ${GITHUB_API_TOKEN}`}}
+).then(async r => {
+    const res = await r.json()
+    if (!res.download_url) return null
+    return [repo.name, res.content]
+})))).filter(i => i !== null))
+---
+
+<!doctype html>
+<html lang="fr">
+<head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION}/>
+    <style>
+        main {
+            width: 960px;
+        }
+
+        ul {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul li {
+            width: calc(50% - 1rem);
+        }
+
+        ul li * {
+            text-decoration: none;
+            transition: 0.2s ease;
+        }
+
+        ul li:first-child {
+            width: 100%;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        ul li:first-child img {
+            width: 100%;
+        }
+
+        ul li:first-child .title {
+            font-size: 2.369rem;
+        }
+
+        ul li img {
+            margin-bottom: 0.5rem;
+            border-radius: 12px;
+            object-fit: cover;
+
+        }
+
+        ul li a {
+            display: block;
+        }
+
+        .title {
+            margin: 0;
+            color: rgb(var(--black));
+            line-height: 1;
+        }
+
+        .date {
+            margin: 0;
+            color: rgb(var(--gray));
+        }
+
+        ul li a:hover h4,
+        ul li a:hover .date {
+            color: rgb(var(--accent));
+        }
+
+        ul a:hover img {
+            box-shadow: var(--box-shadow);
+        }
+
+        @media (max-width: 720px) {
+            ul {
+                gap: 0.5em;
+            }
+
+            ul li {
+                width: 100%;
+                text-align: center;
+            }
+
+            ul li:first-child {
+                margin-bottom: 0;
+            }
+
+            ul li:first-child .title {
+                font-size: 1.563em;
+            }
+        }
+    </style>
+</head>
+<body>
+<Header/>
+<main>
+    <section>
+        <ul>
+            {
+                githubRepositories.map((repository) => (
+                        <li>
+                            <a href={`/repositories/${repository.name}/`}>
+
+                                {repositoriesImages[repository.name] &&
+                                    (<img width={720} height={360}
+                                          src={'data:image/png;base64,' + repositoriesImages[repository.name]} alt=""/>)
+                                }
+
+                                <!-- -->
+                                <h4 class="title">{repository.name}</h4>
+                                <p class="date">
+                                    <FormattedDate date={new Date(repository.created_at)}/>
+                                </p>
+                            </a>
+                        </li>
+                ))
+            }
+        </ul>
+    </section>
+</main>
+<Footer/>
+</body>
+</html>
