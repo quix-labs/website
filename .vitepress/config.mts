@@ -39,6 +39,7 @@ export default defineConfig({
         hostname: 'https://thunder.quix-labs.com'
     },
 
+
     themeConfig: {
         outline: [2, 3],
         logo: '/logo.svg',
@@ -51,10 +52,6 @@ export default defineConfig({
 
         socialLinks: [
             {icon: 'github', link: 'https://github.com/quix-labs'}
-        ],
-
-        search: {
-            provider: 'local',
-        },
+        ]
     }
 })
