@@ -17,13 +17,13 @@ features:
   - title: Thunder
     link: https://thunder.quix-labs.com
     icon:
-      src: /icons/thunder.svg
+      src: https://thunder.quix-labs.com/logo.svg
     details: "Streamlining synchronization between SQL databases and indexers for optimal performance."
 
   - title: Flash
-    link: https://github.com/quix-labs/flash
+    link: https://flash.quix-labs.com
     icon:
-      src: /icons/flash.svg
+      src: https://flash.quix-labs.com/logo.svg
     details: "Go library for managing real-time PostgreSQL changes, perfect for event-sourced applications."
 
 
